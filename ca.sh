@@ -22,7 +22,7 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 
 # 读取输入参数
-if [ $1="-h" -o $1="--help" -o $1="" ];then
+if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo "用法: $0 CA根目录"
   exit 0
 fi
@@ -41,17 +41,20 @@ mkdir ${CA_ROOT}
 cd ${CA_ROOT}
 mkdir newcerts certs crl private requests
 touch index.txt
-echo '01' > serial
+echo '1' > serial
 
 # 下载配置文件
 wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv
-sed "s/TMP_CA_ROOT/${CA_ROOT}/g" ${OPENSSL_CONF}
+sed -i "s#TMP_CA_ROOT#${CA_ROOT}#g" ${OPENSSL_CONF}
 
 # 生成生成根私钥
 openssl genrsa -aes256 -out private/cakey.pem 4096
 
 # 创建根证书
-openssl req -new -x509 -key /root/ca/private/cakey.pem -out cacert.pem -days 3650 -set_serial 0
+openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3650 -set_serial 0
+
+# 修改权限
+chmod -R 600 private
 
 
 ## 安装完成 ##

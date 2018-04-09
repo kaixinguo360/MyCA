@@ -16,43 +16,34 @@ fi
 
 ## 初始化安装参数 ##
 
-# 设置静态参数
-
-
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" ]];then
-  echo "用法: $0 密码"
+  echo "用法: $0 密码 主机名 邮箱"
   exit 0
 fi
 
-CA_PW=$(dirname $(readlink -f $0))
-
-if [ ! "$1" = "-y" ];then
-  read -p "你确定要将当前目录${CA_ROOT}作为CA根目录吗" ENSURE
-fi
+CA_ROOT=$(dirname $(readlink -f $0))
 
 
 ## 正式安装开始 ##
 
-# 创建CA文件夹结构
-mkdir ${CA_ROOT}
-cd ${CA_ROOT}
-mkdir newcerts certs crl private requests
-touch index.txt
-echo '1234' > serial
+# 安装CA
+${CA_ROOT}/ca.sh $1 $2 $3
 
-# 下载配置文件
-wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv
-sed -i "s#TMP_CA_ROOT#${CA_ROOT}#g" ${OPENSSL_CONF}
+# 创建Alias
+cat > myca.sh.env << HERE
+export MYCA_WORKING_DIR="${CA_ROOT}"
+alias myca.sh="${CA_ROOT}/myca.sh"
+HERE
 
-# 生成生成根私钥
-openssl genrsa -aes256 -out private/cakey.pem 4096
+# 加入.bashrc
+HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc
+if [ ! "${HAS_ADDED}" = "" ]; then
+cat >> ~/.bashrc << HERE
+. "${CA_ROOT}/myca.sh.env"
+HERE
+fi
 
-# 创建根证书
-openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3650 -set_serial 0
+# 完成安装，删除临时文件
+#rm -rf ${CA_ROOT}/install.sh ${CA_ROOT}/ca.sh
 
-# 修改权限
-chmod -R 600 private
-
-
-## 安装完成 ##

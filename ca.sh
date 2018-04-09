@@ -22,16 +22,15 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 
 # 读取输入参数
-if [[ $1 = "-h" || $1 = "--help" ]];then
-  echo "用法: $0 CA根目录"
+if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
+  echo "用法: $0 Password CommonName EmailAddress"
   exit 0
 fi
 
+CA_PW=$1
+CommonName=$2
+EmailAddress=$3
 CA_ROOT=$(dirname $(readlink -f $0))
-
-if [ ! "$1" = "-y" ];then
-  read -p "你确定要将当前目录${CA_ROOT}作为CA根目录吗" ENSURE
-fi
 
 
 ## 正式安装开始 ##
@@ -48,10 +47,42 @@ wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv
 sed -i "s#TMP_CA_ROOT#${CA_ROOT}#g" ${OPENSSL_CONF}
 
 # 生成生成根私钥
-openssl genrsa -aes256 -out private/cakey.pem 4096
+expect << HERE
+    spawn openssl genrsa -aes256 -out private/cakey.pem 4096
+    
+    expect "*Enter pass phrase for*"
+    send "$CA_PW\r"
+    
+    expect "*Verifying*"
+    send "$CA_PW\r"
+    
+    expect eof
+HERE
 
 # 创建根证书
-openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3650 -set_serial 0
+expect << HERE
+    spawn openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3650 -set_serial 0
+    
+    expect "*Enter pass phrase for*"
+    send "$CA_PW\r"
+    
+    expect "*Country Name*"
+    send "\r"
+    expect "*State or Province Name*"
+    send "\r"
+    expect "*Locality Name*"
+    send "\r"
+    expect "*Organization Name*"
+    send "\r"
+    expect "*Organizational Unit Name*"
+    send "\r"
+    expect "*Common Name*"
+    send "$CommonName\r"
+    expect "*Email Address*"
+    send "$EmailAddress\r"
+    
+    expect eof
+HERE
 
 # 修改权限
 chmod -R 600 private

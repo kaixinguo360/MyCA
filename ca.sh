@@ -22,7 +22,7 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 
 # 读取输入参数
-if [ $1="-h" || $1="--help" || $1="" ];then
+if [ $1="-h" -o $1="--help" -o $1="" ];then
   echo "用法: $0 CA根目录"
   exit 0
 fi

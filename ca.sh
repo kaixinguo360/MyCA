@@ -22,15 +22,15 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 
 # 读取输入参数
-if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
+if [[ $1 = "-h" || $1 = "--help" ]];then
   echo "用法: $0 CA根目录"
   exit 0
 fi
 
-CA_ROOT=$1
-if [ ! -e ${CA_ROOT} ];then
-  echo "目录不存在!"
-  exit 1
+CA_ROOT=$(dirname $(readlink -f $0))
+
+if [ ! "$1" = "-y" ];then
+  read -p "你确定要将当前目录${CA_ROOT}作为CA根目录吗" ENSURE
 fi
 
 
@@ -41,7 +41,7 @@ mkdir ${CA_ROOT}
 cd ${CA_ROOT}
 mkdir newcerts certs crl private requests
 touch index.txt
-echo '1' > serial
+echo '1234' > serial
 
 # 下载配置文件
 wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv

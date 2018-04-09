@@ -17,8 +17,8 @@ fi
 ## 初始化安装参数 ##
 
 # 设置静态参数
-OPENSSL_CONF=''
-OPENSSL_CONF_URL=''
+OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
+OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
 
 
 # 读取输入参数

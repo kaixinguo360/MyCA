@@ -27,6 +27,9 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 ## 正式安装开始 ##
 
+# 设置权限
+chmod +x ca.sh myca.sh
+
 # 安装CA
 ${CA_ROOT}/ca.sh $1 $2 $3
 

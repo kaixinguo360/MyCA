@@ -49,10 +49,10 @@ do
     esac
 done
 
-if [ -z "${Password}" ];then
-  echo "非法密码"
-  exit 1
-fi
+#if [ -z "${Password}" ];then
+#  echo "非法密码"
+#  exit 1
+#fi
 
 CA_ROOT=$(dirname $(readlink -f $0))
 
@@ -73,15 +73,20 @@ if [ -e ${CommonName}.crt ];then
     fi
 fi
 
+# 加密方式
+if [ -n "$Password" ];then
+    TMP_CMD_1="-aes256"
+    TMP_CMD_2="expect \"*Enter pass phrase for*\"; send \"$Password\r\""
+    TMP_CMD_3="expect \"*Verifying*\"; send \"$Password\r\""
+fi
+
 # 生成私钥
 expect << HERE
-    spawn openssl genrsa -aes256 -out ${CommonName}.key 2048
+    spawn openssl genrsa ${TMP_CMD_1} -out ${CommonName}.key 2048
     
-    expect "*Enter pass phrase for*"
-    send "$Password\r"
+    ${TMP_CMD_2}
     
-    expect "*Verifying*"
-    send "$Password\r"
+    ${TMP_CMD_3}
     
     expect eof
 HERE
@@ -90,8 +95,7 @@ HERE
 expect << HERE
     spawn openssl req -new -key ${CommonName}.key -out ${CommonName}.csr
     
-    expect "*Enter pass phrase for*"
-    send "$Password\r"
+    ${TMP_CMD_2}
     
     expect "*Country Name*"
     send "\r"

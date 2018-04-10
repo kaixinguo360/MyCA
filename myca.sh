@@ -87,6 +87,9 @@ expect << HERE
     expect "*Enter pass phrase for*"
     send "$CA_PW\r"
     
+    expect "*Sign the certificate*"
+    send "y\r"
+    
     expect eof
 HERE
 

@@ -112,7 +112,7 @@ if [ ! -e ${CommonName}.crt ];then
     IS_SUCCESS="n"
 else
     CRT=$(< ${CommonName}.crt)
-    if [ -z "CRT" ];then
+    if [ -z "$CRT" ];then
         IS_SUCCESS="n"
     fi
 fi

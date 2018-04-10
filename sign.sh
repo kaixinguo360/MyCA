@@ -65,7 +65,7 @@ cd mycerts/${CommonName}
 if [ -e ${CommonName}.crt ];then
     CRT=$(< ${CommonName}.crt)
     if [ -n "$CRT" ];then
-        echo -e "\n  ## \033[32m证书\033[0m ${CommonName} \033[32m已存在\033[0m ##\n"
+        echo -e "\n  ## \033[32m证书\033[0m \033[34m${CommonName}\033[0m \033[32m已存在\033[0m ##\n"
         exit 0
     fi
 fi
@@ -144,9 +144,9 @@ fi
 if [ "${IS_SUCCESS}" = "n" ];then
     cd ..
     rm -rf ${CommonName}
-    echo -e "\n  ## \033[31m证书\033[0m ${CommonName} \033[31m签名失败\033[0m ##\n"
+    echo -e "\n  ## \033[31m证书\033[0m \033[34m${CommonName}\033[0m \033[31m签名失败\033[0m ##\n"
     exit 404
 else
-    echo -e "\n  ## \033[32m证书\033[0m ${CommonName} \033[32m签名成功\033[0m ##\n"
+    echo -e "\n  ## \033[32m证书\033[0m \033[34m${CommonName}\033[0m \033[32m签名成功\033[0m ##\n"
     exit 0
 fi

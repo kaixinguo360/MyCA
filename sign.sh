@@ -73,22 +73,24 @@ if [ -e ${CommonName}.crt ];then
     fi
 fi
 
-# 设置密码
+# 加密方式
 if [ -n "$Password" ];then
-    TMP_CMD_1="-aes256"
-    TMP_CMD_2="-passout $Password"
+    TMP_CMD_1="-aes256 -passout pass:$Password"
+    TMP_CMD_2="expect \"*Enter pass phrase for*\"; send \"$Password\r\""
 fi
 
 # 生成私钥
 expect << HERE
-    spawn openssl genrsa ${TMP_CMD_1} ${TMP_CMD_2} -out ${CommonName}.key 2048
+    spawn openssl genrsa ${TMP_CMD_1} -out ${CommonName}.key 2048
     
     expect eof
 HERE
 
 # 创建证书请求
 expect << HERE
-    spawn openssl req -new -key ${CommonName}.key ${TMP_CMD_2} -out ${CommonName}.csr
+    spawn openssl req -new -key ${CommonName}.key -out ${CommonName}.csr
+    
+    ${TMP_CMD_2}
     
     expect "*Country Name*"
     send "\r"

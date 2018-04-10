@@ -60,6 +60,10 @@ chmod +x ca.sh myca.sh
 # 安装CA
 ./ca.sh $PASSWORD $COMMON_NAME $EMAIL
 
+# 保存密码(注意安全)
+echo $PASSWORD > private/passwd
+chmod 600 private/passwd
+
 # 创建Alias
 cat > myca.sh.env << HERE
 export MYCA_WORKING_DIR="${CA_ROOT}"

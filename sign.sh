@@ -59,6 +59,7 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 ## 正式安装开始 ##
 
+
 # 生成证书保存目录
 cd ${CA_ROOT}
 mkdir -p mycerts/${CommonName} > /dev/null
@@ -73,65 +74,37 @@ if [ -e ${CommonName}.crt ];then
     fi
 fi
 
-# 加密方式
-if [ -n "$Password" ];then
-    TMP_CMD_1="-aes256 -passout pass:$Password"
-    TMP_CMD_2="expect \"*Enter pass phrase for*\"; send \"$Password\r\""
-fi
+
+## OpenSSL操作 ##
 
 # 生成私钥
-expect << HERE
-    spawn openssl genrsa ${TMP_CMD_1} -out ${CommonName}.key 2048
-    
-    expect eof
-HERE
+if [ -n "$Password" ];then
+    openssl genrsa -aes256 -passout pass:$Password -out ${CommonName}.key 2048
+else
+    openssl genrsa -out ${CommonName}.key 2048
+fi
+
 
 # 创建证书请求
-expect << HERE
-    spawn openssl req -new -key ${CommonName}.key -out ${CommonName}.csr
-    
-    ${TMP_CMD_2}
-    
-    expect "*Country Name*"
-    send "\r"
-    expect "*State or Province Name*"
-    send "\r"
-    expect "*Locality Name*"
-    send "\r"
-    expect "*Organization Name*"
-    send "\r"
-    expect "*Organizational Unit Name*"
-    send "\r"
-    expect "*Common Name*"
-    send "$CommonName\r"
-    expect "*Email Address*"
-    send "$EmailAddress\r"
-    
-    expect "*A challenge password*"
-    send "\r"
-    expect "*An optional company name*"
-    send "\r"
-    
-    expect eof
-HERE
+openssl req -new -passin pass:"$Password" \
+        -key ${CommonName}.key \
+        -out ${CommonName}.csr \
+        -subj "/C=CN/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/"
+        
+# 上面-subj选项中几个字段的意义
+# C  => Country
+# ST => State
+# L  => City
+# O  => Organization
+# OU => Organization Unit
+# CN => Common Name (证书所请求的域名)
+# emailAddress => main administrative point of contact for the certificate
 
 
 # 签署证书
-CA_PW=$(< ${CA_ROOT}/private/passwd) 
-expect << HERE
-    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.crt
-    
-    expect "*Enter pass phrase for*"
-    send "$CA_PW\r"
-    
-    expect "*Sign the certificate*"
-    send "y\r"
-    
-    expect "*commit?*"
-    send "y\r"
-    
-    expect eof
-HERE
+CA_PW=$(< ${CA_ROOT}/private/passwd)
+openssl ca -batch -passin pass:"$CA_PW" -in ${CommonName}.csr -out ${CommonName}.crt
+
 
 # 验证是否签名成功,否则删除临时文件
 if [ ! -e ${CommonName}.crt ];then

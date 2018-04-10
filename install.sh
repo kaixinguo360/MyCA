@@ -79,5 +79,5 @@ HERE
 fi
 
 # 完成安装，删除临时文件
-#rm -rf install.sh ca.sh
+rm -rf install.sh ca.sh
 

@@ -66,7 +66,7 @@ alias myca.sh="${CA_ROOT}/myca.sh"
 HERE
 
 # 加入.bashrc
-HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc
+HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc)
 if [ ! "${HAS_ADDED}" = "" ]; then
 cat >> ~/.bashrc << HERE
 . "${CA_ROOT}/myca.sh.env"

@@ -42,8 +42,11 @@ cd mycerts/${CommonName}
 
 # 检查是否已经生成证书
 if [ -e ${CommonName}.crt ];then
-    echo -e "\n  ## \033[32m证书已存在\033[0m ##\n"
-    exit 0
+    CRT=$(< ${CommonName}.crt)
+    if [ -n "$CRT" ];then
+        echo -e "\n  ## \033[32m证书已存在\033[0m ##\n"
+        exit 0
+    fi
 fi
 
 # 生成私钥

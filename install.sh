@@ -67,7 +67,8 @@ alias myca.sh="${CA_ROOT}/myca.sh"
 HERE
 
 # 先执行一遍
-source myca.sh.env
+export MYCA_WORKING_DIR="${CA_ROOT}"
+alias myca.sh="${CA_ROOT}/myca.sh"
 
 # 加入.bashrc
 HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc)

@@ -37,7 +37,7 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 # 生成生成私钥
 expect << HERE
-    spawn openssl genrsa -aes256 -out some_serverkey.pem 2048
+    spawn openssl genrsa -aes256 -out ${CommonName}.key 2048
     
     expect "*Enter pass phrase for*"
     send "$Password\r"
@@ -50,7 +50,7 @@ HERE
 
 # 创建证书请求
 expect << HERE
-    spawn openssl req -new -key some_serverkey.pem -out some_server.csr
+    spawn openssl req -new -key ${CommonName}.key -out ${CommonName}.csr
     
     expect "*Enter pass phrase for*"
     send "$Password\r"
@@ -82,7 +82,7 @@ HERE
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd) 
 expect << HERE
-    spawn openssl ca -in some_server.csr -out some_server.pem 
+    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.cer 
     
     expect "*Enter pass phrase for*"
     send "$CA_PW\r"

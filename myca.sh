@@ -87,7 +87,7 @@ HERE
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd) 
 expect << HERE
-    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.cer
+    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.crt
     
     expect "*Enter pass phrase for*"
     send "$CA_PW\r"
@@ -105,7 +105,7 @@ HERE
 rm -rf ${CommonName}.csr
 
 # 验证是否签名成功,否则删除临时文件
-if [ ! -e ${CommonName}.cer ];then
+if [ ! -e ${CommonName}.crt ];then
     cd ..
     rm -rf ${CommonName}
     echo -e "\n  ## \033[31m证书签名失败\033[0m ##\n"

@@ -71,7 +71,7 @@ source myca.sh.env
 
 # 加入.bashrc
 HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc)
-if [ ! "${HAS_ADDED}" = "" ]; then
+if [ "${HAS_ADDED}" = "" ]; then
 cat >> ~/.bashrc << HERE
 . "${CA_ROOT}/myca.sh.env"
 HERE

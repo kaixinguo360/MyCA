@@ -23,13 +23,34 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 Password CommonName EmailAddress"
+  echo "用法: $0 [-p Password -n CommonName -e EmailAddress]"
   exit 0
 fi
 
-Password=$1
-CommonName=$2
-EmailAddress=$3
+while getopts "p:n:e:" arg #选项后面的冒号表示该选项需要参数
+do
+    case $arg in
+        p)
+           Password=$OPTARG
+           ;;
+        n)
+           CommonName=$OPTARG
+           ;;
+        e)
+           EmailAddress=$OPTARG
+           ;;
+        ?)  #当有不认识的选项的时候arg为?
+           echo "未知选项"
+           exit 1
+           ;;
+    esac
+done
+
+if [ -z "${Password}" ];then
+  echo "非法密码"
+  exit 1
+fi
+
 CA_ROOT=$(dirname $(readlink -f $0))
 
 

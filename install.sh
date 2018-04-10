@@ -46,11 +46,12 @@ read -p "请输入你的邮箱地址: " EMAIL
 
 fi
 
-CA_ROOT=$(dirname $(readlink -f $0))
-
+CA_ROOT=$(readlink -f ~/.ca)
 
 ## 正式安装开始 ##
 
+# 克隆仓库
+git clone https://github.com/kaixinguo360/MyCA.git ${CA_ROOT} || exit 1
 cd ${CA_ROOT}
 
 # 设置权限
@@ -64,6 +65,9 @@ cat > myca.sh.env << HERE
 export MYCA_WORKING_DIR="${CA_ROOT}"
 alias myca.sh="${CA_ROOT}/myca.sh"
 HERE
+
+# 先执行一遍
+source myca.sh.env
 
 # 加入.bashrc
 HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc)

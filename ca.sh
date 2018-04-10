@@ -40,7 +40,7 @@ CA_ROOT=$(dirname $(readlink -f $0))
 cd ${CA_ROOT}
 mkdir newcerts certs crl private requests
 touch index.txt
-echo '1' > serial
+echo '01' > serial
 
 # 下载配置文件
 wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv

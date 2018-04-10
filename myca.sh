@@ -25,4 +25,6 @@ if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   exit 0
 fi
 
-sh -c "${CA_ROOT}/$1.sh $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14 $15 $16"
+NAME=$1
+shift
+${CA_ROOT}/${NAME}.sh $@

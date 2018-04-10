@@ -90,6 +90,9 @@ expect << HERE
     expect "*Sign the certificate*"
     send "y\r"
     
+    expect "*commit?*"
+    send "y\r"
+    
     expect eof
 HERE
 

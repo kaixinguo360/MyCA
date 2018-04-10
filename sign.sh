@@ -81,7 +81,7 @@ fi
 
 # 生成私钥
 expect << HERE
-    spawn openssl genrsa ${TMP_CMD_1} ${TMP_CMD_2}-out ${CommonName}.key 2048
+    spawn openssl genrsa ${TMP_CMD_1} ${TMP_CMD_2} -out ${CommonName}.key 2048
     
     expect eof
 HERE
@@ -113,15 +113,14 @@ expect << HERE
     expect eof
 HERE
 
-# 设置密码
-CA_PW=$(< ${CA_ROOT}/private/passwd) 
-if [ -n "$CA_PW" ];then
-    TMP_CMD_3="-passout $CA_PW"
-fi
 
 # 签署证书
+CA_PW=$(< ${CA_ROOT}/private/passwd) 
 expect << HERE
-    spawn openssl ca -in ${CommonName}.csr ${TMP_CMD_3} -out ${CommonName}.crt
+    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.crt
+    
+    expect "*Enter pass phrase for*"
+    send "$CA_PW\r"
     
     expect "*Sign the certificate*"
     send "y\r"

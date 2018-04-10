@@ -48,6 +48,8 @@ sed -i "s#TMP_CA_ROOT#${CA_ROOT}#g" ${OPENSSL_CONF}
 
 # 生成生成根私钥
 expect << HERE
+    set timeout -1
+    
     spawn openssl genrsa -aes256 -out private/cakey.pem 4096
     
     expect "*Enter pass phrase for*"
@@ -61,6 +63,8 @@ HERE
 
 # 创建根证书
 expect << HERE
+    set timeout -1
+    
     spawn openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3650 -set_serial 0
     
     expect "*Enter pass phrase for*"

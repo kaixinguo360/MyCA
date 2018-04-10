@@ -2,7 +2,9 @@
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 Password CommonName EmailAddress"
+  echo -e "用法: $0 [选项]"
+  echo -e "\t-n NAME    设定名称"
+  echo -e "\t-c         新建签名证书"
   exit 0
 fi
 

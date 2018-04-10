@@ -64,6 +64,10 @@ chmod +x ca.sh myca.sh sign.sh
 echo $PASSWORD > private/passwd
 chmod 600 private/passwd
 
+# 创建目录以保存签名过的证书(注意安全)
+mkdir mycerts
+chmod 600 -R mycerts
+
 # 创建Alias
 cat > myca.sh.env << HERE
 export MYCA_WORKING_DIR="${CA_ROOT}"

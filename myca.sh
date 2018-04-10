@@ -109,6 +109,15 @@ HERE
 
 # 验证是否签名成功,否则删除临时文件
 if [ ! -e ${CommonName}.crt ];then
+    IS_SUCCESS="n"
+else
+    CRT=$(< ${CommonName}.crt)
+    if [ -z "CRT" ];then
+        IS_SUCCESS="n"
+    fi
+fi
+
+if [ "${IS_SUCCESS}" = "n" ];then
     cd ..
     rm -rf ${CommonName}
     echo -e "\n  ## \033[31m证书签名失败\033[0m ##\n"
@@ -117,3 +126,4 @@ else
     echo -e "\n  ## \033[32m证书签名成功\033[0m ##\n"
     exit 0
 fi
+

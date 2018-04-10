@@ -37,8 +37,14 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 # 生成证书保存目录
 cd ${CA_ROOT}
-mkdir -p mycerts/${CommonName}
+mkdir -p mycerts/${CommonName} > /dev/null
 cd mycerts/${CommonName}
+
+# 检查是否已经生成证书
+if [ -e ${CommonName}.crt ];then
+    echo -e "\n  ## \033[32m证书已存在\033[0m ##\n"
+    exit 0
+fi
 
 # 生成私钥
 expect << HERE
@@ -101,9 +107,6 @@ expect << HERE
     expect eof
 HERE
 
-# 删除证书请求
-rm -rf ${CommonName}.csr
-
 # 验证是否签名成功,否则删除临时文件
 if [ ! -e ${CommonName}.crt ];then
     cd ..
@@ -114,19 +117,3 @@ else
     echo -e "\n  ## \033[32m证书签名成功\033[0m ##\n"
     exit 0
 fi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

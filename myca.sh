@@ -1,21 +1,6 @@
 #!/bin/bash
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-# 检查是否为Root
-[ $(id -u) != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
-
-# 检查系统信息
-if [ ! -z "`cat /etc/issue | grep 'Ubuntu 16'`" ];
-    then
-        OS='Ubuntu'
-    else
-        echo "Not support OS(Ubuntu 16), Please reinstall OS and retry!"
-        #exit 1
-fi
-
-
-## 初始化安装参数 ##
-
 # 设置静态参数
 CA_ROOT=$(dirname $(readlink -f $0))
 
@@ -25,6 +10,7 @@ if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   exit 0
 fi
 
+# 运行指定命令
 NAME=$1
 shift
 ${CA_ROOT}/${NAME}.sh $@

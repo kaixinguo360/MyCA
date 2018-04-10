@@ -40,7 +40,7 @@ mkdir ${CA_ROOT}
 cd ${CA_ROOT}
 mkdir newcerts certs crl private requests
 touch index.txt
-echo '1234' > serial
+echo '1' > serial
 
 # 下载配置文件
 wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv

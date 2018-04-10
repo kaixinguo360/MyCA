@@ -96,7 +96,8 @@ expect << HERE
     expect eof
 HERE
 
-
+# 删除临时文件
+rm -rf ${CommonName}.csr
 
 
 

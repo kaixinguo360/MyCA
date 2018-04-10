@@ -23,14 +23,15 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 [-p Password -n Name -e EmailAddress]"
+  echo "用法: $0 [-p Password -n Name -e EmailAddress -f]"
   echo -e "\t-p 密码"
   echo -e "\t-n 主机名称"
   echo -e "\t-e 邮箱"
+  echo -e "\t-f 强制重新签署证书"
   exit 0
 fi
 
-while getopts "p:n:e:" arg #选项后面的冒号表示该选项需要参数
+while getopts "p:n:e:f" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
         p)
@@ -41,6 +42,9 @@ do
            ;;
         e)
            EmailAddress=$OPTARG
+           ;;
+        f)
+           FORCE='y'
            ;;
         ?)  #当有不认识的选项的时候arg为?
            echo "未知选项"
@@ -66,7 +70,7 @@ mkdir -p mycerts/${CommonName} > /dev/null
 cd mycerts/${CommonName}
 
 # 检查是否已经生成证书
-if [ -e ${CommonName}.crt ];then
+if [[ ! "$FORCE" = 'y' && -e ${CommonName}.crt ]];then
     CRT=$(< ${CommonName}.crt)
     if [ -n "$CRT" ];then
         echo -e "\n  ## \033[32m证书\033[0m \033[34m${CommonName}\033[0m \033[32m已存在\033[0m ##\n"

@@ -89,7 +89,10 @@ fi
 openssl req -new -passin pass:"$Password" \
         -key ${CommonName}.key \
         -out ${CommonName}.csr \
-        -subj "/C=CN/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/"
+        -subj "/C=CN/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
+        -reqexts SAN \
+        -config <(cat /usr/lib/ssl/openssl.cnf \
+            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
         
 # 上面-subj选项中几个字段的意义
 # C  => Country

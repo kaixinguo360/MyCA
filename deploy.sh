@@ -92,7 +92,7 @@ if [ -n "${CRT_PATH}" ];then
 
     mkdir -p $(dirname ${CRT_PATH}) > /dev/null
     cp ${CommonName}.crt ${CRT_PATH}
-    echo "已将证书复制到${CRT_PATH}"
+    echo "已将 ${CommonName} 的证书复制到${CRT_PATH}"
 fi
 
 # 复制密钥
@@ -110,6 +110,5 @@ if [ -n "${KEY_PATH}" ];then
 
     mkdir -p $(dirname ${KEY_PATH}) > /dev/null
     cp ${CommonName}.key ${KEY_PATH}
-    echo "已将密钥复制到${KEY_PATH}"
+    echo "已将 ${CommonName} 的密钥复制到${KEY_PATH}"
 fi
-

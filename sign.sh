@@ -23,7 +23,10 @@ OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/ope
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 [-p Password -n CommonName -e EmailAddress]"
+  echo "用法: $0 [-p Password -n Name -e EmailAddress]"
+  echo -e "\t-p 密码"
+  echo -e "\t-n 主机名称"
+  echo -e "\t-e 邮箱"
   exit 0
 fi
 

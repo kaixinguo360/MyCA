@@ -35,6 +35,11 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 ## 正式安装开始 ##
 
+# 生成证书保存目录
+cd ${CA_ROOT}
+mkdir -p mycerts/${CommonName}
+cd mycerts/${CommonName}
+
 # 生成生成私钥
 expect << HERE
     spawn openssl genrsa -aes256 -out ${CommonName}.key 2048
@@ -95,6 +100,7 @@ expect << HERE
     
     expect eof
 HERE
+
 
 # 删除临时文件
 rm -rf ${CommonName}.csr

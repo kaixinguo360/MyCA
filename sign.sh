@@ -73,7 +73,7 @@ if [ -e ${CommonName}.crt ];then
     fi
 fi
 
-# 加密方式
+# 设置密码
 if [ -n "$Password" ];then
     TMP_CMD_1="-aes256"
     TMP_CMD_2="-passout $Password"
@@ -113,14 +113,15 @@ expect << HERE
     expect eof
 HERE
 
+# 设置密码
+CA_PW=$(< ${CA_ROOT}/private/passwd) 
+if [ -n "$CA_PW" ];then
+    TMP_CMD_3="-passout $CA_PW"
+fi
 
 # 签署证书
-CA_PW=$(< ${CA_ROOT}/private/passwd) 
 expect << HERE
-    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.crt
-    
-    expect "*Enter pass phrase for*"
-    send "$CA_PW\r"
+    spawn openssl ca -in ${CommonName}.csr ${TMP_CMD_3} -out ${CommonName}.crt
     
     expect "*Sign the certificate*"
     send "y\r"

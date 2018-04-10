@@ -36,7 +36,7 @@ CA_ROOT=$(dirname $(readlink -f $0))
 ## 正式安装开始 ##
 
 # 创建CA文件夹结构
-mkdir ${CA_ROOT}
+#mkdir ${CA_ROOT}
 cd ${CA_ROOT}
 mkdir newcerts certs crl private requests
 touch index.txt

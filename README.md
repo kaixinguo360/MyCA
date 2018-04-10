@@ -6,7 +6,7 @@ Install
 - Description: Auto set up MyCA for Ubuntu 16
 - Dependences: wget git expect
 ```bash
-git clone https://github.com/kaixinguo360/MyCA.git .ca && chmod +x ./.ca/install.sh && sudo ./.ca/install.sh
+wget -O install.sh https://raw.githubusercontent.com/kaixinguo360/MyCA/master/install.sh && chmod +x install.sh && sudo ./install.sh
 ```
 
 ca.sh

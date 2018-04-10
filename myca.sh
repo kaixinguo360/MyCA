@@ -40,7 +40,7 @@ cd ${CA_ROOT}
 mkdir -p mycerts/${CommonName}
 cd mycerts/${CommonName}
 
-# 生成生成私钥
+# 生成私钥
 expect << HERE
     spawn openssl genrsa -aes256 -out ${CommonName}.key 2048
     
@@ -87,7 +87,7 @@ HERE
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd) 
 expect << HERE
-    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.cer 
+    spawn openssl ca -in ${CommonName}.csr -out ${CommonName}.cer
     
     expect "*Enter pass phrase for*"
     send "$CA_PW\r"
@@ -101,9 +101,19 @@ expect << HERE
     expect eof
 HERE
 
-
-# 删除临时文件
+# 删除证书请求
 rm -rf ${CommonName}.csr
+
+# 验证是否签名成功,否则删除临时文件
+if [ ! -e ${CommonName}.cer ];then
+    cd ..
+    rm -rf ${CommonName}
+    echo -e "\n  ## \033[31m证书签名失败\033[0m ##\n"
+    exit 404
+else
+    echo -e "\n  ## \033[32m证书签名成功\033[0m ##\n"
+    exit 0
+fi
 
 
 

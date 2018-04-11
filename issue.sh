@@ -93,7 +93,7 @@ fi
 openssl req -new -passin pass:"$Password" \
         -key ${CommonName}.key \
         -out ${CommonName}.csr \
-        -subj "/C=CN/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
+        -subj "/C=CN/ST=Beijing/L=Beijing/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         #-reqexts SAN \
         -config <(cat /usr/lib/ssl/openssl.cnf \
             <(printf "[ alt_names ]\DNS.1 = ${CommonName}"))

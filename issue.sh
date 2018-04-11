@@ -93,7 +93,7 @@ fi
 openssl req -new -passin pass:"$Password" \
         -key ${CommonName}.key \
         -out ${CommonName}.csr \
-        -subj "/C=CN/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
+        -subj "/C=CN/ST=Beijing/L=Beijing/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         -reqexts SAN \
         -config <(cat /usr/lib/ssl/openssl.cnf \
             <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
@@ -110,7 +110,12 @@ openssl req -new -passin pass:"$Password" \
 
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd)
-openssl ca -batch -passin pass:"$CA_PW" -in ${CommonName}.csr -out ${CommonName}.crt
+openssl ca -batch -passin pass:"$CA_PW" \
+        -in ${CommonName}.csr \
+        -out ${CommonName}.crt \
+        -extensions SAN \
+        -config <(cat /usr/lib/ssl/openssl.cnf \
+            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
 
 
 # 验证是否签名成功,否则删除临时文件

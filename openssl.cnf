@@ -220,7 +220,7 @@ authorityKeyIdentifier=keyid,issuer
 
 basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName=@alt_name
+subjectAltName = @alt_name
 
 [ v3_ca ]
 

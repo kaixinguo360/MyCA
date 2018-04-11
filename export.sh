@@ -154,7 +154,7 @@ if [ -n "${PKCS12_PATH}" ];then
     else
         mkdir -p $(dirname ${PKCS12_PATH}) > /dev/null
     fi
-    openssl pkcs12 -export -clcerts -passout pass:"${PASS_IN}" -in ${CRT_LOCATION} -inkey ${KEY_LOCATION} -out ${PKCS12_PATH}
+    openssl pkcs12 -export -clcerts -passin pass:"${PASS_IN}" -passout pass:"${PASS_OUT}" -in ${CRT_LOCATION} -inkey ${KEY_LOCATION} -out ${PKCS12_PATH}
     echo "已将 ${CommonName} 的PKCS12证书导出到${PKCS12_PATH}"
 fi
 

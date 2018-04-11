@@ -55,7 +55,7 @@ git clone https://github.com/kaixinguo360/MyCA.git ${CA_ROOT} || exit 1
 cd ${CA_ROOT}
 
 # 设置权限
-chmod +x ca.sh myca.sh issue.sh deploy.sh
+chmod +x ca.sh myca.sh issue.sh export.sh
 
 # 安装CA
 ./ca.sh $PASSWORD $COMMON_NAME $EMAIL

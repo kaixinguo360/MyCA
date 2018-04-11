@@ -96,7 +96,7 @@ openssl req -new -passin pass:"$Password" \
         -subj "/C=CN/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         #-reqexts SAN \
         -config <(cat /usr/lib/ssl/openssl.cnf \
-            <(printf "[ alt_name ]\nsubjectAltName=DNS:${CommonName}"))
+            <(printf "[ alt_names ]\DNS.1 = ${CommonName}"))
         
 # 上面-subj选项中几个字段的意义
 # C  => Country

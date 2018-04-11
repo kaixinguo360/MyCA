@@ -110,7 +110,12 @@ openssl req -new -passin pass:"$Password" \
 
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd)
-openssl ca -batch -passin pass:"$CA_PW" -in ${CommonName}.csr -out ${CommonName}.crt
+openssl ca -batch -passin pass:"$CA_PW" \
+        -in ${CommonName}.csr \
+        -out ${CommonName}.crt \
+        -extensions SAN \
+        -config <(cat /usr/lib/ssl/openssl.cnf \
+            <(printf "[ alt_name ]\nsubjectAltName=DNS:${CommonName}"))
 
 
 # 验证是否签名成功,否则删除临时文件

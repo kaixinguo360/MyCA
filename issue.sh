@@ -27,11 +27,12 @@ if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo -e "\t-p 密码"
   echo -e "\t-n 主机名称"
   echo -e "\t-e 邮箱"
+  echo -e "\t-d 证书有效期(天)(默认365)"
   echo -e "\t-f 强制重新签署证书"
   exit 0
 fi
 
-while getopts "p:n:e:f" arg #选项后面的冒号表示该选项需要参数
+while getopts "p:n:e:d:f" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
         p)
@@ -42,6 +43,9 @@ do
            ;;
         e)
            EmailAddress=$OPTARG
+           ;;
+        d)
+           Days=$OPTARG
            ;;
         f)
            FORCE='y'
@@ -88,11 +92,16 @@ else
     openssl genrsa -out ${CommonName}.key 2048
 fi
 
+# 设置过期日期
+if [[ "${Days}" == "" ]]; then
+    Days=365
+fi
 
 # 创建证书请求
 openssl req -new -passin pass:"$Password" \
         -key ${CommonName}.key \
         -out ${CommonName}.csr \
+        -days ${Days} \
         -subj "/C=CN/ST=Beijing/L=Beijing/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         -reqexts SAN \
         -config <(cat /usr/lib/ssl/openssl.cnf \
@@ -107,16 +116,19 @@ openssl req -new -passin pass:"$Password" \
 # CN => Common Name (证书所请求的域名)
 # emailAddress => main administrative point of contact for the certificate
 
-
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd)
 openssl ca -batch -passin pass:"$CA_PW" \
         -in ${CommonName}.csr \
         -out ${CommonName}.crt \
+        -days ${Days} \
         -extensions SAN \
         -config <(cat /usr/lib/ssl/openssl.cnf \
             <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
 
+#清空index.txt文件
+rm ${CA_ROOT}/index.txt
+touch ${CA_ROOT}/index.txt
 
 # 验证是否签名成功,否则删除临时文件
 if [ ! -e ${CommonName}.crt ];then

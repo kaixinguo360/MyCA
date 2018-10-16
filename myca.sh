@@ -10,6 +10,7 @@ if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo -e "    功能: issue     生成新的证书"
   echo -e "          export    导出证书"
   echo -e "          backup    备份数据"
+  echo -e "          tmp       临时证书"
   exit 0
 fi
 

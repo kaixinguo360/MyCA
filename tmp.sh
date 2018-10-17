@@ -16,11 +16,6 @@ fi
 
 ## 初始化安装参数 ##
 
-# 设置静态参数
-OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
-OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
-
-
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo "用法: $0 [-d Days -o Output]"
@@ -49,9 +44,6 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 ## 正式安装开始 ##
 
-
-# 生成证书保存目录
-mkdir -p ${Output} > /dev/null
 
 # 设置过期日期
 if [[ "${Days}" == "" ]]; then

@@ -20,15 +20,19 @@ fi
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo "用法: $0 [-d Days -o Output]"
   echo -e "\t-d 证书有效期(天)(默认1)"
+  echo -e "\t-p 证书保护密码"
   echo -e "\t-o 证书输出位置"
   exit 0
 fi
 
-while getopts "d:o:" arg #选项后面的冒号表示该选项需要参数
+while getopts "d:p:o:" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
         d)
            Days=$OPTARG
+           ;;
+        p)
+           Passwd=$OPTARG
            ;;
         o)
            Output=$(readlink -f $OPTARG)
@@ -55,4 +59,9 @@ cd ${CA_ROOT}
 ./issue.sh -n kaixinguo.tmp -d ${Days} -e kaixinguo@kaixinguo.site -f
 
 # 导出证书
-./export.sh -n kaixinguo.tmp -p ${Output}
+if [[ "$Passwd" == "" ]]; then
+    ./export.sh -n kaixinguo.tmp -p ${Output}
+else
+    ./export.sh -n kaixinguo.tmp -p ${Output} -o ${Passwd}
+fi
+

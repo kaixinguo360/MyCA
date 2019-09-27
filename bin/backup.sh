@@ -16,24 +16,21 @@ fi
 
 ## 初始化安装参数 ##
 
+# 设置静态参数
+OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
+OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
+
+
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 [-d Days -o Output]"
-  echo -e "\t-d 证书有效期(天)(默认1)"
-  echo -e "\t-p 证书保护密码"
-  echo -e "\t-o 证书输出位置"
+  echo "用法: $0 [-o Output]"
+  echo -e "\t-o 输出路径"
   exit 0
 fi
 
-while getopts "d:p:o:" arg #选项后面的冒号表示该选项需要参数
+while getopts "o:" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
-        d)
-           Days=$OPTARG
-           ;;
-        p)
-           Passwd=$OPTARG
-           ;;
         o)
            Output=$(readlink -f $OPTARG)
            ;;
@@ -44,24 +41,19 @@ do
     esac
 done
 
-CA_ROOT=$(dirname $(readlink -f $0))
+CA_ROOT=$(realpath $(dirname $0)/..)
+CA_DATA=$CA_ROOT/data
 
-## 正式安装开始 ##
+
+## 正式备份开始 ##
 
 
-# 设置过期日期
-if [[ "${Days}" == "" ]]; then
-    Days=1
-fi
+# 生成证书保存目录
+Output="${Output}/myca.bak"
+mkdir -p ${Output} > /dev/null
 
-# 生成证书
-cd ${CA_ROOT}
-./issue.sh -n kaixinguo.tmp -d ${Days} -e kaixinguo@kaixinguo.site -f
+# 备份文件
+cp -a ${CA_DATA} ${Output}/data
+cp /usr/lib/ssl/openssl.cnf ${Output}/openssl.cnf
 
-# 导出证书
-if [[ "$Passwd" == "" ]]; then
-    ./export.sh -n kaixinguo.tmp -p ${Output}
-else
-    ./export.sh -n kaixinguo.tmp -p ${Output} -o ${Passwd}
-fi
 

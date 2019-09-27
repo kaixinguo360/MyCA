@@ -1,15 +1,1 @@
-cacert.pem
-index.txt
-index.txt.attr
-index.txt.attr.old
-index.txt.old
-myca.sh.env
-serial
-serial.old
-
-private/
-mycerts/
-newcerts/
-requests/
-certs/
-crl/
+/data

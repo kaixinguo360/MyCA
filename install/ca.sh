@@ -20,6 +20,9 @@ fi
 OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
 OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
 
+CA_ROOT=$(realpath $(dirname $0)/..)
+CA_DATA=$CA_ROOT/data
+
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
@@ -30,21 +33,20 @@ fi
 CA_PW=$1
 CommonName=$2
 EmailAddress=$3
-CA_ROOT=$(dirname $(readlink -f $0))
 
 
 ## 正式安装开始 ##
 
 # 创建CA文件夹结构
-#mkdir ${CA_ROOT}
-cd ${CA_ROOT}
+mkdir -p ${CA_DATA}
+cd ${CA_DATA}
 mkdir newcerts certs crl private requests
 touch index.txt
 echo '01' > serial
 
 # 下载配置文件
 wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv
-sed -i "s#TMP_CA_ROOT#${CA_ROOT}#g" ${OPENSSL_CONF}
+sed -i "s#TMP_CA_DATA#${CA_DATA}#g" ${OPENSSL_CONF}
 
 # 生成生成根私钥
 expect << HERE

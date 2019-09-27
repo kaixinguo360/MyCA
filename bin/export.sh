@@ -4,7 +4,8 @@ export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 ## 初始化安装参数 ##
 
 # 设置静态参数
-CA_ROOT=$(dirname $(readlink -f $0))
+CA_ROOT=$(realpath $(dirname $0)/..)
+CA_DATA=$CA_ROOT/data
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
@@ -71,8 +72,7 @@ for arg do
    exit 1
 done
 
-CA_ROOT=$(dirname $(readlink -f $0))
-cd ${CA_ROOT}
+cd ${CA_DATA}
 CERT_HOME="mycerts/${FileName}"
 CRT_LOCATION="${CERT_HOME}/${FileName}.crt"
 KEY_LOCATION="${CERT_HOME}/${FileName}.key"

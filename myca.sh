@@ -17,4 +17,4 @@ fi
 # 运行指定命令
 NAME=$1
 shift
-${CA_ROOT}/${NAME}.sh $@
+${CA_ROOT}/bin/${NAME}.sh $@

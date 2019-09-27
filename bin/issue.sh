@@ -20,6 +20,9 @@ fi
 OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
 OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
 
+CA_ROOT=$(realpath $(dirname $0)/..)
+CA_DATA=$CA_ROOT/data
+
 # 设置默认参数
 EmailAddress=${USER}@$(cat /etc/mailname||echo $HOSTNAME)
 Days=365
@@ -67,14 +70,12 @@ done
 #  exit 1
 #fi
 
-CA_ROOT=$(dirname $(readlink -f $0))
-
 
 ## 正式安装开始 ##
 
 
 # 生成证书保存目录
-cd ${CA_ROOT}
+cd ${CA_DATA}
 mkdir -p mycerts/${FileName} > /dev/null
 cd mycerts/${FileName}
 
@@ -117,7 +118,7 @@ openssl req -new -passin pass:"$Password" \
 # emailAddress => main administrative point of contact for the certificate
 
 # 签署证书
-CA_PW=$(< ${CA_ROOT}/private/passwd)
+CA_PW=$(< ${CA_DATA}/private/passwd)
 openssl ca -batch -passin pass:"$CA_PW" \
         -in ${FileName}.csr \
         -out ${FileName}.crt \
@@ -127,8 +128,8 @@ openssl ca -batch -passin pass:"$CA_PW" \
             <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
 
 #清空index.txt文件
-rm ${CA_ROOT}/index.txt
-touch ${CA_ROOT}/index.txt
+rm ${CA_DATA}/index.txt
+touch ${CA_DATA}/index.txt
 
 # 验证是否签名成功,否则删除临时文件
 if [ ! -e ${FileName}.crt ];then

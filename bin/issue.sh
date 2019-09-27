@@ -1,9 +1,6 @@
 #!/bin/bash
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-# 检查是否为Root
-[ $(id -u) != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
-
 # 检查系统信息
 if [ ! -z "`cat /etc/issue | grep 'Ubuntu 16'`" ];
     then
@@ -20,6 +17,9 @@ fi
 CA_ROOT=$(realpath $(dirname $0)/..)
 CA_DATA="$CA_ROOT/data"
 CA_CONF="$CA_ROOT/openssl.cnf"
+
+# 检查是否有操作权限
+[ ! -r "${CA_DATA}/private" ] && { echo "Error: Permission denied. Please make sure you have the correct access rights"; exit 1; }
 
 # 设置默认参数
 EmailAddress=${USER}@$(cat /etc/mailname||echo $HOSTNAME)

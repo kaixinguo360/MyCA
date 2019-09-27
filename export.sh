@@ -28,6 +28,7 @@ while true ; do
     case "$1" in
         -n|--name)
             CommonName=$2
+            FileName=$(echo "$CommonName"|sed 's/\*/_/g')
             shift 2
             ;;
         -k|--key)
@@ -72,9 +73,9 @@ done
 
 CA_ROOT=$(dirname $(readlink -f $0))
 cd ${CA_ROOT}
-CERT_HOME="mycerts/${CommonName}"
-CRT_LOCATION="${CERT_HOME}/${CommonName}.crt"
-KEY_LOCATION="${CERT_HOME}/${CommonName}.key"
+CERT_HOME="mycerts/${FileName}"
+CRT_LOCATION="${CERT_HOME}/${FileName}.crt"
+KEY_LOCATION="${CERT_HOME}/${FileName}.key"
 
 ## 正式导出开始 ##
 

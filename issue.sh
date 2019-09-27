@@ -20,14 +20,18 @@ fi
 OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
 OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
 
+# 设置默认参数
+EmailAddress=${USER}@$(cat /etc/mailname||echo $HOSTNAME)
+Days=365
+
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo "用法: $0 [-p Password -n Name -e EmailAddress -f]"
-  echo -e "\t-p 密码"
-  echo -e "\t-n 主机名称"
-  echo -e "\t-e 邮箱"
-  echo -e "\t-d 证书有效期(天)(默认365)"
+  echo -e "\t-n 主机名称(必须)"
+  echo -e "\t-p 密码(默认无密码)"
+  echo -e "\t-e 邮箱(默认'${EmailAddress}')"
+  echo -e "\t-d 证书有效期(天)(默认${Days})"
   echo -e "\t-f 强制重新签署证书"
   exit 0
 fi
@@ -35,11 +39,12 @@ fi
 while getopts "p:n:e:d:f" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
-        p)
-           Password=$OPTARG
-           ;;
         n)
            CommonName=$OPTARG
+           FileName=$(echo "$CommonName"|sed 's/\*/_/g')
+           ;;
+        p)
+           Password=$OPTARG
            ;;
         e)
            EmailAddress=$OPTARG
@@ -70,12 +75,12 @@ CA_ROOT=$(dirname $(readlink -f $0))
 
 # 生成证书保存目录
 cd ${CA_ROOT}
-mkdir -p mycerts/${CommonName} > /dev/null
-cd mycerts/${CommonName}
+mkdir -p mycerts/${FileName} > /dev/null
+cd mycerts/${FileName}
 
 # 检查是否已经生成证书
-if [[ ! "$FORCE" = 'y' && -e ${CommonName}.crt ]];then
-    CRT=$(< ${CommonName}.crt)
+if [[ ! "$FORCE" = 'y' && -e ${FileName}.crt ]];then
+    CRT=$(< ${FileName}.crt)
     if [ -n "$CRT" ];then
         echo -e "\n  ## \033[32m证书\033[0m \033[34m${CommonName}\033[0m \033[32m已存在\033[0m ##\n"
         exit 0
@@ -87,20 +92,15 @@ fi
 
 # 生成私钥
 if [ -n "$Password" ];then
-    openssl genrsa -aes256 -passout pass:$Password -out ${CommonName}.key 2048
+    openssl genrsa -aes256 -passout pass:$Password -out ${FileName}.key 2048
 else
-    openssl genrsa -out ${CommonName}.key 2048
-fi
-
-# 设置过期日期
-if [[ "${Days}" == "" ]]; then
-    Days=365
+    openssl genrsa -out ${FileName}.key 2048
 fi
 
 # 创建证书请求
 openssl req -new -passin pass:"$Password" \
-        -key ${CommonName}.key \
-        -out ${CommonName}.csr \
+        -key ${FileName}.key \
+        -out ${FileName}.csr \
         -days ${Days} \
         -subj "/C=CN/ST=Beijing/L=Beijing/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         -reqexts SAN \
@@ -119,8 +119,8 @@ openssl req -new -passin pass:"$Password" \
 # 签署证书
 CA_PW=$(< ${CA_ROOT}/private/passwd)
 openssl ca -batch -passin pass:"$CA_PW" \
-        -in ${CommonName}.csr \
-        -out ${CommonName}.crt \
+        -in ${FileName}.csr \
+        -out ${FileName}.crt \
         -days ${Days} \
         -extensions SAN \
         -config <(cat /usr/lib/ssl/openssl.cnf \
@@ -131,10 +131,10 @@ rm ${CA_ROOT}/index.txt
 touch ${CA_ROOT}/index.txt
 
 # 验证是否签名成功,否则删除临时文件
-if [ ! -e ${CommonName}.crt ];then
+if [ ! -e ${FileName}.crt ];then
     IS_SUCCESS="n"
 else
-    CRT=$(< ${CommonName}.crt)
+    CRT=$(< ${FileName}.crt)
     if [ -z "$CRT" ];then
         IS_SUCCESS="n"
     fi
@@ -142,7 +142,7 @@ fi
 
 if [ "${IS_SUCCESS}" = "n" ];then
     cd ..
-    rm -rf ${CommonName}
+    rm -rf ${FileName}
     echo -e "\n  ## \033[31m证书\033[0m \033[34m${CommonName}\033[0m \033[31m签名失败\033[0m ##\n"
     exit 404
 else

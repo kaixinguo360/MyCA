@@ -17,9 +17,6 @@ fi
 ## 初始化安装参数 ##
 
 # 设置静态参数
-OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
-OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
-
 CA_ROOT=$(realpath $(dirname $0)/..)
 CA_DATA=$CA_ROOT/data
 
@@ -43,10 +40,6 @@ cd ${CA_DATA}
 mkdir newcerts certs crl private requests
 touch index.txt
 echo '01' > serial
-
-# 下载配置文件
-wget -O ${OPENSSL_CONF} ${OPENSSL_CONF_URL} -nv
-sed -i "s#TMP_CA_DATA#${CA_DATA}#g" ${OPENSSL_CONF}
 
 # 生成生成根私钥
 expect << HERE
@@ -93,5 +86,12 @@ HERE
 # 修改权限
 chmod -R 600 private
 
+# 保存密码(注意安全)
+echo $CA_PW > private/passwd
+chmod 600 private/passwd
+
+# 创建目录以保存签名过的证书(注意安全)
+mkdir -p mycerts
+chmod 600 -R mycerts
 
 ## 安装完成 ##

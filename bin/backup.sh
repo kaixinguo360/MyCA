@@ -17,9 +17,8 @@ fi
 ## 初始化安装参数 ##
 
 # 设置静态参数
-OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
-OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
-
+CA_ROOT=$(realpath $(dirname $0)/..)
+CA_DATA=$CA_ROOT/data
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
@@ -40,9 +39,6 @@ do
            ;;
     esac
 done
-
-CA_ROOT=$(realpath $(dirname $0)/..)
-CA_DATA=$CA_ROOT/data
 
 
 ## 正式备份开始 ##

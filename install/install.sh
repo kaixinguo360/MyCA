@@ -54,38 +54,10 @@ CA_ROOT=$(readlink -f ~/.ca)
 git clone https://github.com/kaixinguo360/MyCA.git ${CA_ROOT} || exit 1
 cd ${CA_ROOT}
 
-# 设置权限
-chmod +x ca.sh myca.sh issue.sh export.sh
+# 初始化CA
+./bin/init.sh $PASSWORD $COMMON_NAME $EMAIL
 
-# 安装CA
-./ca.sh $PASSWORD $COMMON_NAME $EMAIL
+# 创建软链接
+ln -s ${CA_ROOT}/myca.sh /usr/local/bin
 
-# 保存密码(注意安全)
-echo $PASSWORD > private/passwd
-chmod 600 private/passwd
-
-# 创建目录以保存签名过的证书(注意安全)
-mkdir mycerts
-chmod 600 -R mycerts
-
-# 创建Alias
-cat > myca.sh.env << HERE
-export MYCA_WORKING_DIR="${CA_ROOT}"
-alias myca.sh="${CA_ROOT}/myca.sh"
-HERE
-
-# 先执行一遍
-export MYCA_WORKING_DIR="${CA_ROOT}"
-alias myca.sh="${CA_ROOT}/myca.sh"
-
-# 加入.bashrc
-HAS_ADDED=$(sed -n "#${CA_ROOT}/myca.sh.env#p" ~/.bashrc)
-if [ "${HAS_ADDED}" = "" ]; then
-cat >> ~/.bashrc << HERE
-. "${CA_ROOT}/myca.sh.env"
-HERE
-fi
-
-# 完成安装，删除临时文件
-rm -rf install.sh ca.sh README.md openssl.cnf
 

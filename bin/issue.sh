@@ -17,11 +17,9 @@ fi
 ## 初始化安装参数 ##
 
 # 设置静态参数
-OPENSSL_CONF='/usr/lib/ssl/openssl.cnf'
-OPENSSL_CONF_URL='https://raw.githubusercontent.com/kaixinguo360/MyCA/master/openssl.cnf'
-
 CA_ROOT=$(realpath $(dirname $0)/..)
-CA_DATA=$CA_ROOT/data
+CA_DATA="$CA_ROOT/data"
+CA_CONF="$CA_ROOT/openssl.cnf"
 
 # 设置默认参数
 EmailAddress=${USER}@$(cat /etc/mailname||echo $HOSTNAME)
@@ -105,8 +103,8 @@ openssl req -new -passin pass:"$Password" \
         -days ${Days} \
         -subj "/C=CN/ST=Beijing/L=Beijing/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         -reqexts SAN \
-        -config <(cat /usr/lib/ssl/openssl.cnf \
-            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
+        -config <(cat "${CA_CONF}" \
+            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}")|sed "s#TMP_CA_DATA#${CA_DATA}#g")
         
 # 上面-subj选项中几个字段的意义
 # C  => Country
@@ -124,8 +122,8 @@ openssl ca -batch -passin pass:"$CA_PW" \
         -out ${FileName}.crt \
         -days ${Days} \
         -extensions SAN \
-        -config <(cat /usr/lib/ssl/openssl.cnf \
-            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}"))
+        -config <(cat "${CA_CONF}" \
+            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}")|sed "s#TMP_CA_DATA#${CA_DATA}#g")
 
 #清空index.txt文件
 rm ${CA_DATA}/index.txt

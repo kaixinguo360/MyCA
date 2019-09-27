@@ -31,16 +31,17 @@ Days=365
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 [-p Password -n Name -e EmailAddress -f]"
+  echo "用法: $0 [-n Name] [-p Password] [-e EmailAddress] [-d Days] [-w] [-f]"
   echo -e "\t-n 主机名称(必须)"
   echo -e "\t-p 密码(默认无密码)"
   echo -e "\t-e 邮箱(默认'${EmailAddress}')"
   echo -e "\t-d 证书有效期(天)(默认${Days})"
+  echo -e "\t-w 支持泛域名"
   echo -e "\t-f 强制重新签署证书"
   exit 0
 fi
 
-while getopts "p:n:e:d:f" arg #选项后面的冒号表示该选项需要参数
+while getopts "p:n:e:d:wf" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
         n)
@@ -55,6 +56,9 @@ do
            ;;
         d)
            Days=$OPTARG
+           ;;
+        w)
+           Wildcard='y'
            ;;
         f)
            FORCE='y'
@@ -99,6 +103,12 @@ else
     openssl genrsa -out ${FileName}.key 2048
 fi
 
+# 设置替代名称
+SubjectAltName="DNS:${CommonName}"
+if [ -n "$Wildcard" ];then
+    SubjectAltName="${SubjectAltName},DNS:*.${CommonName}"
+fi
+
 # 创建证书请求
 openssl req -new -passin pass:"$Password" \
         -key ${FileName}.key \
@@ -107,7 +117,7 @@ openssl req -new -passin pass:"$Password" \
         -subj "/C=CN/ST=Beijing/L=Beijing/O=${CommonName}/CN=${CommonName}/emailAddress=${EmailAddress}/" \
         -reqexts SAN \
         -config <(cat "${CA_CONF}" \
-            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}")|sed "s#TMP_CA_DATA#${CA_DATA}#g")
+            <(printf "[SAN]\nsubjectAltName=${SubjectAltName}")|sed "s#TMP_CA_DATA#${CA_DATA}#g")
         
 # 上面-subj选项中几个字段的意义
 # C  => Country
@@ -126,11 +136,14 @@ openssl ca -batch -passin pass:"$CA_PW" \
         -days ${Days} \
         -extensions SAN \
         -config <(cat "${CA_CONF}" \
-            <(printf "[SAN]\nsubjectAltName=DNS:${CommonName}")|sed "s#TMP_CA_DATA#${CA_DATA}#g")
+            <(printf "[SAN]\nsubjectAltName=${SubjectAltName}")|sed "s#TMP_CA_DATA#${CA_DATA}#g")
 
-#清空index.txt文件
+# 清空index.txt文件
 rm ${CA_DATA}/index.txt
 touch ${CA_DATA}/index.txt
+
+# 清空newcerts文件夹
+rm -f ${CA_DATA}/newcerts/*
 
 # 验证是否签名成功,否则删除临时文件
 if [ ! -e ${FileName}.crt ];then

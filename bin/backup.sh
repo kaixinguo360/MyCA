@@ -45,11 +45,9 @@ done
 
 
 # 生成证书保存目录
-Output="${Output}/myca.bak"
-mkdir -p ${Output} > /dev/null
+mkdir -p ${Output}
 
 # 备份文件
-cp -a ${CA_DATA} ${Output}/data
-cp /usr/lib/ssl/openssl.cnf ${Output}/openssl.cnf
-
+cd ${CA_ROOT}
+tar -zcf ${Output}/myca_$(date "+%Y%m%d_%H%M%S").tar.gz ./data
 

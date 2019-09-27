@@ -18,8 +18,11 @@ CA_ROOT=$(realpath $(dirname $0)/..)
 CA_DATA="$CA_ROOT/data"
 CA_CONF="$CA_ROOT/openssl.cnf"
 
+# 检查是否已初始化
+[[ ! -d "${CA_DATA}/private" ]] && { echo "找不到CA根证书! 是否未初始化?"; exit 1; }
+
 # 检查是否有操作权限
-[ ! -r "${CA_DATA}/private" ] && { echo "Error: Permission denied. Please make sure you have the correct access rights"; exit 1; }
+[[ -d "${CA_DATA}/private" && ! -r "${CA_DATA}/private" ]] && { echo "Error: Permission denied. Please make sure you have the correct access rights"; exit 1; }
 
 # 设置默认参数
 EmailAddress=${USER}@$(cat /etc/mailname||echo $HOSTNAME)

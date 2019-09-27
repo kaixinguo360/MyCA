@@ -7,6 +7,9 @@ export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 CA_ROOT=$(realpath $(dirname $0)/..)
 CA_DATA=$CA_ROOT/data
 
+# 检查是否已初始化
+[[ ! -d "${CA_DATA}/private" ]] && { echo "找不到CA根证书! 是否未初始化?"; exit 1; }
+
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   echo -e "用法: $0 [-n|--name Name] [-k|--key Key Path] [-c|--crt Crt Path]"
@@ -90,6 +93,10 @@ fi
 
 # 导出证书
 if [ -n "${CRT_PATH}" ];then
+    if [ ! -n "${CommonName}" ];then
+        echo "未指定证书名称! 请使用 -n 参数指定证书名称!"
+        exit 1
+    fi
     if [ -e ${CRT_LOCATION} ];then
         CRT=$(< ${CRT_LOCATION})
         if [ -z "$CRT" ];then
@@ -109,6 +116,10 @@ fi
 
 # 导出密钥
 if [ -n "${KEY_PATH}" ];then
+    if [ ! -n "${CommonName}" ];then
+        echo "未指定证书名称! 请使用 -n 参数指定证书名称!"
+        exit 1
+    fi
     if [ -e ${KEY_LOCATION} ];then
         CRT=$(< ${KEY_LOCATION})
         if [ -z "$CRT" ];then
@@ -128,6 +139,10 @@ fi
 
 # 导出PKCS12证书文件
 if [ -n "${PKCS12_PATH}" ];then
+    if [ ! -n "${CommonName}" ];then
+        echo "未指定证书名称! 请使用 -n 参数指定证书名称!"
+        exit 1
+    fi
     if [ -e ${CRT_LOCATION} ];then
         CRT=$(< ${CRT_LOCATION})
         if [ -z "$CRT" ];then

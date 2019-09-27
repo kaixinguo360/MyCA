@@ -84,7 +84,7 @@ expect << HERE
 HERE
 
 # 修改权限
-chmod -R 600 private
+chmod -R 700 private
 
 # 保存密码(注意安全)
 echo $CA_PW > private/passwd
@@ -92,6 +92,6 @@ chmod 600 private/passwd
 
 # 创建目录以保存签名过的证书(注意安全)
 mkdir -p mycerts
-chmod 600 -R mycerts
+chmod 700 -R mycerts
 
 ## 安装完成 ##

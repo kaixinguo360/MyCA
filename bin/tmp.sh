@@ -17,8 +17,11 @@ fi
 CA_ROOT=$(realpath $(dirname $0)/..)
 CA_DATA=$CA_ROOT/data
 
+# 检查是否已初始化
+[[ ! -d "${CA_DATA}/private" ]] && { echo "找不到CA根证书! 是否未初始化?"; exit 1; }
+
 # 检查是否有操作权限
-[ ! -r "${CA_DATA}/private" ] && { echo "Error: Permission denied. Please make sure you have the correct access rights"; exit 1; }
+[[ -d "${CA_DATA}/private" && ! -r "${CA_DATA}/private" ]] && { echo "Error: Permission denied. Please make sure you have the correct access rights"; exit 1; }
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then

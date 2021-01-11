@@ -12,10 +12,11 @@ CA_DATA=$CA_ROOT/data
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo -e "用法: $0 [-n|--name Name] [-k|--key Key Path] [-c|--crt Crt Path]"
+  echo -e "用法: $0 [-n|--name Name] [-k|--key Key Path] [-c|--crt Crt Path] ..."
   echo -e "\t-n --name      主机名称"
   echo -e "\t-a --ca        导出CA证书"
   echo -e "\t-c --crt       导出证书"
+  echo -e "\t-l --full      导出证书链"
   echo -e "\t-k --key       导出私钥"
   echo -e "\t-p --pkcs12    导出PKCS12证书文件"
   echo -e "\t-i --passin    输入密码"
@@ -23,7 +24,7 @@ if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
   exit 0
 fi
 
-TEMP=`getopt -o n:k:c:p:i:o:a: --long name:,key:,crt:,pkcs12:,passin:,passout:,ca: \
+TEMP=`getopt -o n:k:c:l:p:i:o:a: --long name:,key:,crt:,full:,pkcs12:,passin:,passout:,ca: \
      -n "$0" -- "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
@@ -41,6 +42,10 @@ while true ; do
             ;;
         -c|--crt)
             CRT_PATH=$(readlink -f $2)
+            shift 2
+            ;;
+        -l|--full)
+            FULL_PATH=$(readlink -f $2)
             shift 2
             ;;
         -p|--pkcs12)
@@ -111,6 +116,30 @@ if [ -n "${CRT_PATH}" ];then
     mkdir -p $(dirname ${CRT_PATH}) > /dev/null
     cp ${CRT_LOCATION} ${CRT_PATH}
     echo "已将 ${CommonName} 的证书导出到${CRT_PATH}"
+fi
+
+
+# 导出证书链
+if [ -n "${FULL_PATH}" ];then
+    if [ ! -n "${CommonName}" ];then
+        echo "未指定证书名称! 请使用 -n 参数指定证书名称!"
+        exit 1
+    fi
+    if [ -e ${CRT_LOCATION} ];then
+        CRT=$(< ${CRT_LOCATION})
+        if [ -z "$CRT" ];then
+            echo "${CommonName}证书不合法！"
+            exit 1
+        fi
+    else
+        echo "无法找到${CommonName}证书！它可能不存在或您没有读取权限"
+        exit 1
+    fi
+
+    mkdir -p $(dirname ${FULL_PATH}) > /dev/null
+    cp ${CRT_LOCATION} ${FULL_PATH}
+    cat cacert.pem >> ${FULL_PATH}
+    echo "已将 ${CommonName} 的证书导出到${FULL_PATH}"
 fi
 
 

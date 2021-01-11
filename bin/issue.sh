@@ -25,23 +25,26 @@ CA_CONF="$CA_ROOT/openssl.cnf"
 [[ -d "${CA_DATA}/private" && ! -r "${CA_DATA}/private" ]] && { echo "Error: Permission denied. Please make sure you have the correct access rights"; exit 1; }
 
 # 设置默认参数
-EmailAddress=${USER}@$(cat /etc/mailname||echo $HOSTNAME)
+EmailAddress=${USER}@$(cat /etc/mailname 2>/dev/null||echo $HOSTNAME)
 Days=365
 
 
 # 读取输入参数
 if [[ $1 = "-h" || $1 = "--help" || $1 = "" ]];then
-  echo "用法: $0 [-n Name] [-p Password] [-e EmailAddress] [-d Days] [-w] [-f]"
-  echo -e "\t-n 主机名称(必须)"
-  echo -e "\t-p 密码(默认无密码)"
-  echo -e "\t-e 邮箱(默认'${EmailAddress}')"
-  echo -e "\t-d 证书有效期(天)(默认${Days})"
-  echo -e "\t-w 支持泛域名"
+  echo "用法: $0 [-n Name] [-p Password] [-e EmailAddress] [-d Days] [-w] [-s Additional SAN] [-f]"
+  echo -e "\t-n 主机名称 (必须)"
+  echo -e "\t-p 密码 (默认无密码)"
+  echo -e "\t-e 邮箱 (默认'${EmailAddress}')"
+  echo -e "\t-d 证书有效期(天) (默认${Days})"
+  echo -e "\t-w 支持泛域名, 即在主题备用名称中添加: 'DNS:*.<主机名称>'"
+  echo -e "\t-s 附加主题备用名称SAN, 纯文本, 需符合指定格式"
+  echo -e "\t   可以添加IP形式的主题备用名称"
+  echo -e "\t   范例: 'DNS:<主题备用名称1>,DNS:<主题备用名称2>,IP:<主题备用名称3>,...'"
   echo -e "\t-f 强制重新签署证书"
   exit 0
 fi
 
-while getopts "p:n:e:d:wf" arg #选项后面的冒号表示该选项需要参数
+while getopts "p:n:e:d:ws:f" arg #选项后面的冒号表示该选项需要参数
 do
     case $arg in
         n)
@@ -59,6 +62,9 @@ do
            ;;
         w)
            Wildcard='y'
+           ;;
+        s)
+           AdditionalSubjectAltName=$OPTARG
            ;;
         f)
            FORCE='y'
@@ -105,7 +111,10 @@ fi
 
 # 设置替代名称
 SubjectAltName="DNS:${CommonName}"
-if [ -n "$Wildcard" ];then
+if [ -n "$AdditionalSubjectAltName" ];then # 附加的主题备用名称SAN
+    SubjectAltName="${SubjectAltName},${AdditionalSubjectAltName}"
+fi
+if [ -n "$Wildcard" ];then # 泛域名
     SubjectAltName="${SubjectAltName},DNS:*.${CommonName}"
 fi
 
